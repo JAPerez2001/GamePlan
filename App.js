@@ -6,6 +6,16 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { GiftedChat } from "react-native-gifted-chat";
 import {Agenda} from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as AddCalendarEvent from 'react-native-add-calendar-event';
+
+const eventConfig = {
+  title,
+  startDate,
+  endDate,
+  location,
+  allDay,
+  notes
+};
 
 function Chat() {
   return (
@@ -38,6 +48,7 @@ function Calendar() {
           </TouchableOpacity>
         )}
       />
+      AddCalendarEvent
     </SafeAreaView>
   );
 }
@@ -57,8 +68,7 @@ const styles = StyleSheet.create({
   },
   itemText:{
     color: 'black',
-    fontSize: 14,
-    
+    fontSize: 14
   }
 })
 
