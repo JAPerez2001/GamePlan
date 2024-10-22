@@ -11,14 +11,14 @@ function ChatScreen() {
 
 const Tab = createBottomTabNavigator();
 
-function tabs() {
+export default function App() {
   return (
     <Tab.Navigator>
       <Tab.Screen name = "Chat" component={ChatScreen} />
     </Tab.Navigator>
   )
 }
-
+/*
 export default function Chat() {
   return (
     <View
@@ -31,4 +31,4 @@ export default function Chat() {
       <Text>Changed</Text>
     </View>
   );
-}
+}*/
