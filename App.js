@@ -1,8 +1,11 @@
 import * as React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { GiftedChat } from "react-native-gifted-chat";
+import {Agenda} from 'react-native-calendars';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 function Chat() {
   return (
@@ -22,11 +25,29 @@ function Finder() {
 
 function Calendar() {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Calendar!</Text>
-    </View>
+    <SafeAreaView style={styles.container}>
+      <Agenda
+        items={{
+          '2024-10-22': [{name: 'Practice', data: '@UTD campus'}],
+          '2024-10-26': [{name: 'Tournament', data: '@UTD campus'}]
+        }}
+        renderItem={(item, isFirst) => (
+          <TouchableOpacity style={styles.item}>
+            <Text style={styles.itemText}>{item.name}</Text>
+            <Text style={styles.itemText}>{item.data}</Text>
+          </TouchableOpacity>
+        )}
+      />
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container:{
+    flex: 1,
+
+  }
+})
 
 function Profile() {
   return (
