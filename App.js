@@ -45,7 +45,20 @@ function Calendar() {
 const styles = StyleSheet.create({
   container:{
     flex: 1,
-
+  },
+  item:{
+    backgroundColor: 'lightblue',
+    flex: 1,
+    borderRadius: 5, 
+    padding: 10,
+    marginRight: 10,
+    marginTop: 25,
+    paddingBottom: 20
+  },
+  itemText:{
+    color: 'black',
+    fontSize: 14,
+    
   }
 })
 
