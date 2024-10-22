@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "bottom-tabs-navigator-|-react-navigation",
+    "slug": "snack-3af08e42-0092-4541-aeaa-c6bce75f1128",
+    "version": "1.0.0",
+    "main": "expo-router/entry",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
