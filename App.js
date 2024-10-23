@@ -8,15 +8,6 @@ import {Agenda} from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as AddCalendarEvent from 'react-native-add-calendar-event';
 
-const eventConfig = {
-  title,
-  startDate,
-  endDate,
-  location,
-  allDay,
-  notes
-};
-
 function Chat() {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -48,7 +39,6 @@ function Calendar() {
           </TouchableOpacity>
         )}
       />
-      AddCalendarEvent
     </SafeAreaView>
   );
 }
