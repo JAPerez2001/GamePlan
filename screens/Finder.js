@@ -1,26 +1,20 @@
-// /screens/Finder.js
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native';
+import Map from './screens/Map';
 
 const Finder = () => {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Field Finder Feature Coming Soon!</Text>
-    </View>
-  );
-};
+    const initialRegion = {
+        latitude: 37.78825, // Initial latitude
+        longitude: -122.4324, // Initial longitude
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+    };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-  },
-  text: {
-    fontSize: 18,
-    color: '#333',
-  },
-});
+    return (
+        <SafeAreaView style={{ flex: 1 }}>
+            <Map initialRegion={initialRegion} />
+        </SafeAreaView>
+    );
+};
 
 export default Finder;
