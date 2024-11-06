@@ -5,7 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 // Import screens
-import ChatStack from './ChatStack';  // Assuming ChatStack handles chat list and conversations
+import ChatStack from './ChatStack';
 import Calendar from '../screens/Calendar';
 import Finder from '../screens/Finder';
 import Profile from '../screens/Profile';
@@ -23,13 +23,13 @@ export default function AppNavigator() {
       >
         <Tab.Screen
           name="Chat"
-          component={ChatStack}  // ChatStack handles both chat list and conversation screens
+          component={ChatStack}
           options={{
             tabBarLabel: 'Chat',
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="chat" color={color} size={size} />
             ),
-            headerShown: false,  // Hide header for chat screens
+            headerShown: false, 
           }}
         />
         <Tab.Screen
