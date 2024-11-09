@@ -56,7 +56,7 @@ const Finder = () => {
           )}
         </MapView>
       )}
-      <TextInput>
+      <TextInput
         style={{
           borderRadius: 10,
           margin: 10,
@@ -70,7 +70,7 @@ const Finder = () => {
           }}
           placeholder={'Search'}
           placeholderTextColor={'#666'}
-        </TextInput>
+        />
     </View>
   );
 };
