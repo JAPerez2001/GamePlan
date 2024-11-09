@@ -32,7 +32,7 @@ const ChatList = ({ navigation, route }) => {
       try {
         await addDoc(collection(db, 'chats'), {
           name: newChatName,
-          profilePictureUrl: '', // You can update this field with a default or user-uploaded image URL
+          profilePictureUrl: '',
         });
         setNewChatName('');
         setModalVisible(false);
@@ -54,7 +54,6 @@ const ChatList = ({ navigation, route }) => {
             onPress={() => navigation.navigate('Conversation', { name: item.id })}
             style={styles.chatItem}
           >
-            {/* Profile picture */}
             {item.profilePictureUrl ? (
               <Image
                 source={{ uri: item.profilePictureUrl }}
@@ -69,7 +68,6 @@ const ChatList = ({ navigation, route }) => {
         )}
       />
 
-      {/* Modal for creating a new chat */}
       <Modal
         animationType="fade"
         transparent={true}
@@ -109,7 +107,7 @@ const styles = StyleSheet.create({
   },
   chatName: {
     fontSize: 18,
-    marginLeft: 10,  // Add margin to separate the name from the image
+    marginLeft: 10, 
   },
   profilePicture: {
     width: 40,
@@ -120,16 +118,16 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#ccc',  // Placeholder color
+    backgroundColor: '#ccc', 
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',  // Semi-transparent background
-    justifyContent: 'center',  // Center the modal vertically
-    alignItems: 'center',      // Center the modal horizontally
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    justifyContent: 'center', 
+    alignItems: 'center',     
   },
   modalView: {
-    width: '80%',  // Adjust the width as needed
+    width: '80%',  
     backgroundColor: 'white',
     padding: 20,
     borderRadius: 10,
@@ -138,7 +136,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   input: {
-    width: '100%',  // Make input field take full width of modal
+    width: '100%',  
     borderColor: '#ccc',
     borderWidth: 1,
     padding: 8,

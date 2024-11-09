@@ -13,13 +13,13 @@ function ChatStackScreen({ navigation }) {
         name="ChatList"
         component={ChatList}
         options={{
-          title: 'Chats',  // Set the title for the screen
+          title: 'Chats',  
           headerRight: () => (
             <MaterialCommunityIcons
               name="plus"
               size={24}
               style={{ marginRight: 15 }}
-              onPress={() => navigation.navigate('ChatList', { showModal: true })}  // Trigger modal when pressed
+              onPress={() => navigation.navigate('ChatList', { showModal: true })} 
             />
           ),
         }}

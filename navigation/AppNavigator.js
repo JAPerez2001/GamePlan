@@ -8,7 +8,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ChatStack from './ChatStack';
 import Calendar from '../screens/Calendar';
 import Finder from '../screens/Finder';
-import Profile from '../screens/Profile';
+import Settings from '../screens/Settings';
 
 const Tab = createBottomTabNavigator();
 
@@ -53,12 +53,12 @@ export default function AppNavigator() {
           }}
         />
         <Tab.Screen
-          name="Profile"
-          component={Profile}
+          name="Settings"
+          component={Settings}
           options={{
-            tabBarLabel: "Profile",
+            tabBarLabel: "Settings",
             tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="account" color={color} size={size} />
+              <MaterialCommunityIcons name="cog" color={color} size={size} />
             ),
           }}
         />
