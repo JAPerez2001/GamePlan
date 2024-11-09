@@ -30,8 +30,8 @@ const Finder = () => {
       setCurrentLocation(location.coords);
 
       setInitialRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
+        latitude: 32.9857,
+        longitude: 96.7502,
         latitudeDelta: 0.005,
         longitudeDelta: 0.005,
       });
