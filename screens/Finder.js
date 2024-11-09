@@ -10,6 +10,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
+import { TextInput } from "react-native-gesture-handler";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -55,7 +56,23 @@ const Finder = () => {
           )}
         </MapView>
       )}
-      {/* Rest of your code */}
+      {
+        <TextInput>
+          style={{
+            borderRadius: 10,
+            margin: 10,
+            color: '#000',
+            borderColor: '#666',
+            backgroundColor: '#FFF',
+            borderWidth: 1,
+            height: 45,
+            paddingHorizontal: 10,
+            fontSize: 18,
+          }}
+          placeholder={'Search'}
+          placeholderTextColor={'#666'}
+        </TextInput>
+      }
     </View>
   );
 };
