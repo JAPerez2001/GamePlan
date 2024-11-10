@@ -8,10 +8,12 @@ import {
   TouchableOpacity,
   Text,
   Modal,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import * as Location from "expo-location";
-import MapView, { Marker } from "react-native-maps";
-import { useDebounce } from 'use-debounce'; // Added debounce hook
+import MapView, { Marker, Callout } from "react-native-maps";
+import { useDebounce } from 'use-debounce';
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -21,40 +23,41 @@ const Finder = () => {
   const [loading, setLoading] = useState(true);
   const [region, setRegion] = useState(null);
   const [searchQuery, setSearchQuery] = useState(""); 
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 500); // Added debounced search
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
   const [searchResults, setSearchResults] = useState([]);
-  const [selectedPlace, setSelectedPlace] = useState(null); // State to track selected place
-  const [showDetails, setShowDetails] = useState(false); // State to toggle location details modal
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [showDetails, setShowDetails] = useState(false);
 
-  // Hardcoded practice locations
+  // Hardcoded locations
   const predefinedPlaces = [
-    { name: "UTD Soccer Field 1", latitude: 32.9832, longitude: -96.7515 },
-    { name: "UTD Soccer Field 2", latitude: 32.9832, longitude: -96.7525 },
-    { name: "UTD Soccer Field 3", latitude: 32.9832, longitude: -96.7535 },
-    { name: "UTD Soccer Field 4", latitude: 32.9820, longitude: -96.7518 },
-    { name: "UTD Soccer Field 5", latitude: 32.9820, longitude: -96.7528 },
-    { name: "UTD Tennis Courts", latitude: 32.9828, longitude: -96.7502 },
+    { id: 1, name: "UTD Soccer Field 1", latitude: 32.9832, longitude: -96.7515 },
+    { id: 2, name: "UTD Soccer Field 2", latitude: 32.9832, longitude: -96.7525 },
+    { id: 3, name: "UTD Soccer Field 3", latitude: 32.9832, longitude: -96.7535 },
+    { id: 4, name: "UTD Soccer Field 4", latitude: 32.9820, longitude: -96.7518 },
+    { id: 5, name: "UTD Soccer Field 5", latitude: 32.9820, longitude: -96.7528 },
+    { id: 6, name: "UTD Tennis Courts", latitude: 32.9828, longitude: -96.7502 },
   ];
-
 
   useEffect(() => {
     const getLocation = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        console.log("Permission to access location was denied");
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setLoading(false);
+          return;
+        }
+        let location = await Location.getCurrentPositionAsync({});
+        setCurrentLocation(location.coords);
+        setRegion({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        });
         setLoading(false);
-        return;
+      } catch (error) {
+        setLoading(false);
       }
-
-      let location = await Location.getCurrentPositionAsync({});
-      setCurrentLocation(location.coords);
-      setRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      });
-      setLoading(false);
     };
 
     getLocation();
@@ -64,7 +67,7 @@ const Finder = () => {
     if (debouncedSearchQuery !== "") {
       handleSearch(debouncedSearchQuery);
     } else {
-      setSearchResults([]); // Clear search results if query is empty
+      setSearchResults([]);
     }
   }, [debouncedSearchQuery]);
 
@@ -82,6 +85,9 @@ const Finder = () => {
       latitudeDelta: 0.005,
       longitudeDelta: 0.005,
     });
+    setSelectedPlace(place); // Update the selected place
+    setSearchQuery("");  // Clears the search query
+    setSearchResults([]);  // Clears the search results
   };
 
   const handleSelectPlaceFromMap = (place) => {
@@ -104,74 +110,83 @@ const Finder = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search for places"
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={styles.container}>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search for places"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
 
-      {searchResults.length > 0 && (
-        <View style={styles.resultsContainer}>
-          {searchResults.map((result, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => handleSelectPlaceFromSearch(result)} // Only update map region, no modal
-            >
-              <Text style={styles.resultItem}>{result.name}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
-
-      {region && (
-        <MapView style={styles.map} region={region} onRegionChangeComplete={handleRegionChange}>
-          {currentLocation && (
-            <Marker
-              coordinate={{
-                latitude: currentLocation.latitude,
-                longitude: currentLocation.longitude,
-              }}
-              title="Your Location"
-            />
-          )}
-          {predefinedPlaces.map((result, index) => (
-            <Marker
-              key={index}
-              coordinate={{
-                latitude: result.latitude,
-                longitude: result.longitude,
-              }}
-              title={result.name}
-              onPress={() => handleSelectPlaceFromMap(result)} // Show details when marker is clicked
-            />
-          ))}
-        </MapView>
-      )}
-
-      {/* Modal to show location details when a pin is clicked */}
-      {selectedPlace && showDetails && (
-        <Modal
-          visible={showDetails}
-          animationType="slide"
-          onRequestClose={() => setShowDetails(false)} // Close the modal when the user presses back
-        >
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>{selectedPlace.name}</Text>
-            <Text style={styles.modalDescription}>Booking Information:</Text>
-            <Text style={styles.modalDescription}>Availability: M W THU SUN</Text>
-            <Text style={styles.modalDescription}>Phone Number: +19728832111</Text>
-            <TouchableOpacity onPress={(addEvent) => setShowDetails(false)}>
-
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setShowDetails(false)}>
-              <Text style={styles.closeButton}>Close</Text>
-            </TouchableOpacity>
+        {searchResults.length > 0 && (
+          <View style={styles.resultsContainer}>
+            {searchResults.map((result, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => handleSelectPlaceFromSearch(result)} // Select place from search
+              >
+                <Text style={styles.resultItem}>{result.name}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
-        </Modal>
-      )}
-    </View>
+        )}
+
+        {region && (
+          <MapView
+            style={styles.map}
+            region={region}
+            onRegionChangeComplete={handleRegionChange}
+          >
+            {currentLocation && (
+              <Marker
+                coordinate={{
+                  latitude: currentLocation.latitude,
+                  longitude: currentLocation.longitude,
+                }}
+                title="Your Location"
+              />
+            )}
+            {predefinedPlaces.map((place) => (
+              <Marker
+                key={place.id}
+                coordinate={{
+                  latitude: place.latitude,
+                  longitude: place.longitude,
+                }}
+                title={place.name}
+                pinColor={selectedPlace && selectedPlace.id === place.id ? "blue" : "red"} // Highlight selected marker
+                onPress={() => handleSelectPlaceFromMap(place)}
+              >
+                {selectedPlace && selectedPlace.id === place.id && (
+                  <Callout>
+                    <Text>{place.name}</Text>
+                  </Callout>
+                )}
+              </Marker>
+            ))}
+          </MapView>
+        )}
+
+        {selectedPlace && showDetails && (
+          <Modal
+            visible={showDetails}
+            animationType="slide"
+            onRequestClose={() => setShowDetails(false)}
+          >
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>{selectedPlace.name}</Text>
+              <Text style={styles.modalDescription}>Booking Information:</Text>
+              <Text style={styles.modalDescription}>Availability: M W THU SUN</Text>
+              <Text style={styles.modalDescription}>Phone Number: +19728832111</Text>
+              <TouchableOpacity onPress={() => setShowDetails(false)}>
+                <Text style={styles.closeButton}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+        )}
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
