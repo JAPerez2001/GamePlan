@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Text,
+  Modal,
 } from "react-native";
 import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
@@ -20,8 +21,10 @@ const Finder = () => {
   const [loading, setLoading] = useState(true);
   const [region, setRegion] = useState(null);
   const [searchQuery, setSearchQuery] = useState(""); 
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 500); // Add debounced search
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 500); // Added debounced search
   const [searchResults, setSearchResults] = useState([]);
+  const [selectedPlace, setSelectedPlace] = useState(null); // State to track selected place
+  const [showDetails, setShowDetails] = useState(false); // State to toggle location details modal
 
   // Hardcoded practice locations
   const predefinedPlaces = [
@@ -32,6 +35,7 @@ const Finder = () => {
     { name: "UTD Soccer Field 5", latitude: 32.9820, longitude: -96.7528 },
     { name: "UTD Tennis Courts", latitude: 32.9828, longitude: -96.7502 },
   ];
+
 
   useEffect(() => {
     const getLocation = async () => {
@@ -71,14 +75,18 @@ const Finder = () => {
     setSearchResults(results);
   };
 
-  const handleSelectPlace = (place) => {
+  const handleSelectPlaceFromSearch = (place) => {
     setRegion({
       latitude: place.latitude,
       longitude: place.longitude,
       latitudeDelta: 0.005,
       longitudeDelta: 0.005,
     });
-    setSearchResults([]);
+  };
+
+  const handleSelectPlaceFromMap = (place) => {
+    setSelectedPlace(place); // Set the selected place details
+    setShowDetails(true); // Show the details modal
   };
 
   const handleRegionChange = (newRegion) => {
@@ -109,7 +117,7 @@ const Finder = () => {
           {searchResults.map((result, index) => (
             <TouchableOpacity
               key={index}
-              onPress={() => handleSelectPlace(result)}
+              onPress={() => handleSelectPlaceFromSearch(result)} // Only update map region, no modal
             >
               <Text style={styles.resultItem}>{result.name}</Text>
             </TouchableOpacity>
@@ -136,9 +144,27 @@ const Finder = () => {
                 longitude: result.longitude,
               }}
               title={result.name}
+              onPress={() => handleSelectPlaceFromMap(result)} // Show details when marker is clicked
             />
           ))}
         </MapView>
+      )}
+
+      {/* Modal to show location details when a pin is clicked */}
+      {selectedPlace && showDetails && (
+        <Modal
+          visible={showDetails}
+          animationType="slide"
+          onRequestClose={() => setShowDetails(false)} // Close the modal when the user presses back
+        >
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>{selectedPlace.name}</Text>
+            <Text style={styles.modalDescription}>{selectedPlace.description}</Text>
+            <TouchableOpacity onPress={() => setShowDetails(false)}>
+              <Text style={styles.closeButton}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
       )}
     </View>
   );
@@ -183,6 +209,26 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "white",
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+  modalDescription: {
+    fontSize: 16,
+    marginVertical: 20,
+  },
+  closeButton: {
+    fontSize: 18,
+    color: "blue",
+    marginTop: 10,
   },
 });
 
