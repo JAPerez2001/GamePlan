@@ -4,15 +4,18 @@ import { Text, View, StyleSheet, TouchableOpacity, Modal, TextInput, Button } fr
 import { Agenda } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-function Calendar({ navigation }) {
+function Calendar({ route, navigation }) {
+  const {showCreateEventModal, location} = route.params || {}
   const [items, setItems] = useState({
     '2024-10-22': [{ name: 'Practice', data: '@UTD campus' }],
     '2024-10-26': [{ name: 'Tournament', data: '@UTD campus' }]
   });
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const [newEvent, setNewEvent] = useState({ name: '', data: '' });
-  const [selectedDate, setSelectedDate] = useState('');
+  const [modalVisible, setModalVisible] = useState(!!showCreateEventModal);
+  const [newEvent, setNewEvent] = useState({ name: '', data: location ?? '' });
+  const currentDate = new Date();
+  const formattedDate = currentDate.toISOString().split('T')[0];
+  const [selectedDate, setSelectedDate] = useState(formattedDate);
 
   const addEvent = () => {
     if (newEvent.name && selectedDate) {
