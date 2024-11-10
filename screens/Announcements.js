@@ -71,12 +71,14 @@ function Announcements() {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalContainer}>
+          <Text>Title:</Text>
           <TextInput
             placeholder="Title"
             value={newTitle}
             onChangeText={setNewTitle}
             style={styles.input}
           />
+          <Text>Description:</Text>
           <TextInput
             placeholder="Description"
             value={newDescription}

@@ -6,8 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 function Calendar({ navigation }) {
   const [items, setItems] = useState({
-    '2024-10-22': [{ name: 'Practice', data: '@UTD campus' }],
-    '2024-10-26': [{ name: 'Tournament', data: '@UTD campus' }]
+    '2024-11-9': [{ name: 'Practice', data: '@UTD campus' }],
+    '2024-11-10': [{ name: 'Tournament', data: '@UTD campus' }]
   });
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -63,12 +63,15 @@ function Calendar({ navigation }) {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalContainer}>
+        <Text style={{textAlign: 'center', fontSize: 24, padding: 10 }}>Add Event</Text>
+        <Text>Event Name:</Text>
           <TextInput
             placeholder="Event Name"
             value={newEvent.name}
             onChangeText={(text) => setNewEvent({ ...newEvent, name: text })}
             style={styles.input}
           />
+          <Text>Location (optional:)</Text>
           <TextInput
             placeholder="Location (Optional)"
             value={newEvent.data}
@@ -111,9 +114,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
-  },
-  placeholder: 'Title',
-  placeholderTextColor: '#666'
+  }
   
 });
 
