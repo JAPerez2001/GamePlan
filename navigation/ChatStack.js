@@ -1,3 +1,4 @@
+// ChatStack.js
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -13,15 +14,7 @@ function ChatStackScreen({ navigation }) {
         name="ChatList"
         component={ChatList}
         options={{
-          title: 'Chats',  // Set the title for the screen
-          headerRight: () => (
-            <MaterialCommunityIcons
-              name="plus"
-              size={24}
-              style={{ marginRight: 15 }}
-              onPress={() => navigation.navigate('ChatList', { showModal: true })}  // Trigger modal when pressed
-            />
-          ),
+          title: 'Chats',  
         }}
       />
       <ChatStack.Screen 
