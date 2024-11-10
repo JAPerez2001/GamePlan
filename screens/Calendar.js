@@ -112,6 +112,9 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
+  placeholder: 'Title',
+  placeholderTextColor: '#666'
+  
 });
 
 export default Calendar;
