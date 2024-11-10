@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, FlatList, TextInput, Button, StyleSheet, Image } from 'react-native';
 import { collection, doc, getDoc, addDoc, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 function Conversation({ route, navigation }) {
   const { name } = route.params;
@@ -9,8 +10,7 @@ function Conversation({ route, navigation }) {
   const [messages, setMessages] = useState([]);
   const [chatDetails, setChatDetails] = useState(null);
 
-  // Hardcoded senderId for simplicity
-  const senderId = "user1";  // Change this as needed to simulate different users
+  const senderId = "user1";
 
   useEffect(() => {
     const q = query(collection(db, 'chats', name, 'messages'), orderBy('timestamp'));
@@ -19,37 +19,44 @@ function Conversation({ route, navigation }) {
       snapshot.forEach((doc) => {
         loadedMessages.push({ id: doc.id, ...doc.data() });
       });
-      setMessages(loadedMessages); // Firebase handles message order
+      setMessages(loadedMessages);
     });
 
     return () => unsubscribe();
   }, [name]);
 
-  // Fetch chat details (including profile picture) when the component loads
   useEffect(() => {
     const fetchChatDetails = async () => {
       const chatDoc = doc(db, 'chats', name);
       const chatSnapshot = await getDoc(chatDoc);
       if (chatSnapshot.exists()) {
-        setChatDetails(chatSnapshot.data()); // Store chat details (including profile picture)
+        setChatDetails(chatSnapshot.data());
       }
     };
 
     fetchChatDetails();
   }, [name]);
 
-  // Set the header options (title and profile picture)
   useEffect(() => {
     if (chatDetails) {
       navigation.setOptions({
         headerTitle: () => (
           <View style={styles.headerTitleContainer}>
             <Image
-              source={{ uri: chatDetails.profilePictureUrl }} // Profile picture URL
+              source={{ uri: chatDetails.profilePictureUrl }}
               style={styles.profilePicture}
             />
             <Text style={styles.chatTitle}>{chatDetails.name || name}</Text>
           </View>
+        ),
+        headerRight: () => (
+          <MaterialCommunityIcons
+            name="bell" // Icon for announcements
+            size={24}
+            color="black"
+            style={styles.headerIcon}
+            onPress={() => navigation.navigate('Announcements')}
+          />
         ),
       });
     }
@@ -125,7 +132,7 @@ function Conversation({ route, navigation }) {
         contentContainerStyle={styles.chatContainer}
         scrollEventThrottle={16}
       />
-      
+
       {/* Input for Sending Messages */}
       <View style={styles.inputContainer}>
         <TextInput
@@ -211,6 +218,9 @@ const styles = StyleSheet.create({
   headerTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  headerIcon: {
+    marginRight: 15,
   },
   dateContainer: {
     alignItems: 'center',
