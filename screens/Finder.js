@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
+import { useDebounce } from 'use-debounce'; // Added debounce hook
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -18,8 +19,19 @@ const Finder = () => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [region, setRegion] = useState(null);
-  const [searchQuery, setSearchQuery] = useState(""); // For search query
-  const [searchResults, setSearchResults] = useState([]); // To hold search results
+  const [searchQuery, setSearchQuery] = useState(""); 
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 500); // Add debounced search
+  const [searchResults, setSearchResults] = useState([]);
+
+  // Hardcoded practice locations
+  const predefinedPlaces = [
+    { name: "UTD Soccer Field 1", latitude: 32.9832, longitude: -96.7515 },
+    { name: "UTD Soccer Field 4", latitude: 32.9820, longitude: -96.7518 },
+    { name: "Park", latitude: 32.9800, longitude: -96.7550 },
+    { name: "Gym", latitude: 32.9880, longitude: -96.7530 },
+    { name: "Library", latitude: 32.9825, longitude: -96.7545 },
+    { name: "Mall", latitude: 32.9870, longitude: -96.7520 },
+  ];
 
   useEffect(() => {
     const getLocation = async () => {
@@ -32,63 +44,47 @@ const Finder = () => {
 
       let location = await Location.getCurrentPositionAsync({});
       setCurrentLocation(location.coords);
-
-      // Set the region to the user's current location
       setRegion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
         latitudeDelta: 0.005,
         longitudeDelta: 0.005,
       });
-
       setLoading(false);
     };
 
     getLocation();
   }, []);
 
-  // Function to handle search query
-  const handleSearch = async (query) => {
-    if (query === "") {
-      setSearchResults([]); // If query is empty, clear results
-      return;
+  useEffect(() => {
+    if (debouncedSearchQuery !== "") {
+      handleSearch(debouncedSearchQuery);
+    } else {
+      setSearchResults([]); // Clear search results if query is empty
     }
+  }, [debouncedSearchQuery]);
 
-    // For simplicity, use reverse geocoding based on the current location
-    const results = await findNearbyPlaces(query);
-
-    setSearchResults(results); // Set the search results to state
-  };
-
-  // Example function that generates nearby places based on distance and current location
-  const findNearbyPlaces = async (query) => {
-    // Predefined places nearby. You can modify this list or get dynamic data from your backend.
-    const predefinedPlaces = [
-      { name: "Coffee Shop", latitude: 32.9857, longitude: -96.7502 },
-      { name: "Restaurant", latitude: 32.9900, longitude: -96.7600 },
-      { name: "Park", latitude: 32.9800, longitude: -96.7550 },
-      { name: "Gym", latitude: 32.9880, longitude: -96.7530 },
-    ];
-
-    // Simulate a search based on the query and find places that match the query
-    const filteredPlaces = predefinedPlaces.filter((place) =>
+  const handleSearch = async (query) => {
+    const results = predefinedPlaces.filter((place) =>
       place.name.toLowerCase().includes(query.toLowerCase())
     );
-
-    // Optionally, you can add a filter to calculate distance to the current location here
-
-    return filteredPlaces;
+    setSearchResults(results);
   };
 
   const handleSelectPlace = (place) => {
-    // Update map region based on the selected place
     setRegion({
       latitude: place.latitude,
       longitude: place.longitude,
       latitudeDelta: 0.005,
       longitudeDelta: 0.005,
     });
-    setSearchResults([]); // Clear search results after selection
+    setSearchResults([]);
+  };
+
+  const handleRegionChange = (newRegion) => {
+    if (newRegion.latitude !== region.latitude || newRegion.longitude !== region.longitude) {
+      setRegion(newRegion);
+    }
   };
 
   if (loading) {
@@ -101,18 +97,13 @@ const Finder = () => {
 
   return (
     <View style={styles.container}>
-      {/* Search bar */}
       <TextInput
         style={styles.searchBar}
         placeholder="Search for places"
         value={searchQuery}
-        onChangeText={(text) => {
-          setSearchQuery(text);
-          handleSearch(text);
-        }}
+        onChangeText={setSearchQuery}
       />
 
-      {/* Search results list */}
       {searchResults.length > 0 && (
         <View style={styles.resultsContainer}>
           {searchResults.map((result, index) => (
@@ -126,9 +117,8 @@ const Finder = () => {
         </View>
       )}
 
-      {/* Map View */}
       {region && (
-        <MapView style={styles.map} region={region} onRegionChangeComplete={setRegion}>
+        <MapView style={styles.map} region={region} onRegionChangeComplete={handleRegionChange}>
           {currentLocation && (
             <Marker
               coordinate={{
@@ -138,8 +128,7 @@ const Finder = () => {
               title="Your Location"
             />
           )}
-          {/* Render markers for search results */}
-          {searchResults.map((result, index) => (
+          {predefinedPlaces.map((result, index) => (
             <Marker
               key={index}
               coordinate={{
