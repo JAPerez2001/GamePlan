@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import MapView, { Marker, Callout } from "react-native-maps";
-import { useDebounce } from 'use-debounce'; // Added debounce hook
+import { useDebounce } from 'use-debounce';
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -23,19 +23,19 @@ const Finder = () => {
   const [loading, setLoading] = useState(true);
   const [region, setRegion] = useState(null);
   const [searchQuery, setSearchQuery] = useState(""); 
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 500); // Added debounced search
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
   const [searchResults, setSearchResults] = useState([]);
-  const [selectedPlace, setSelectedPlace] = useState(null); // State to track selected place
-  const [showDetails, setShowDetails] = useState(false); // State to toggle location details modal
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [showDetails, setShowDetails] = useState(false);
 
-  // Hardcoded practice locations
+  // Hardcoded locations
   const predefinedPlaces = [
-    { name: "UTD Soccer Field 1", latitude: 32.9832, longitude: -96.7515 },
-    { name: "UTD Soccer Field 2", latitude: 32.9832, longitude: -96.7525 },
-    { name: "UTD Soccer Field 3", latitude: 32.9832, longitude: -96.7535 },
-    { name: "UTD Soccer Field 4", latitude: 32.9820, longitude: -96.7518 },
-    { name: "UTD Soccer Field 5", latitude: 32.9820, longitude: -96.7528 },
-    { name: "UTD Tennis Courts", latitude: 32.9828, longitude: -96.7502 },
+    { id: 1, name: "UTD Soccer Field 1", latitude: 32.9832, longitude: -96.7515 },
+    { id: 2, name: "UTD Soccer Field 2", latitude: 32.9832, longitude: -96.7525 },
+    { id: 3, name: "UTD Soccer Field 3", latitude: 32.9832, longitude: -96.7535 },
+    { id: 4, name: "UTD Soccer Field 4", latitude: 32.9820, longitude: -96.7518 },
+    { id: 5, name: "UTD Soccer Field 5", latitude: 32.9820, longitude: -96.7528 },
+    { id: 6, name: "UTD Tennis Courts", latitude: 32.9828, longitude: -96.7502 },
   ];
 
   useEffect(() => {
@@ -43,11 +43,9 @@ const Finder = () => {
       try {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
-          console.log("Permission to access location was denied");
           setLoading(false);
           return;
         }
-
         let location = await Location.getCurrentPositionAsync({});
         setCurrentLocation(location.coords);
         setRegion({
@@ -58,7 +56,6 @@ const Finder = () => {
         });
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching location", error);
         setLoading(false);
       }
     };
@@ -70,7 +67,7 @@ const Finder = () => {
     if (debouncedSearchQuery !== "") {
       handleSearch(debouncedSearchQuery);
     } else {
-      setSearchResults([]); // Clear search results if query is empty
+      setSearchResults([]);
     }
   }, [debouncedSearchQuery]);
 
@@ -88,6 +85,7 @@ const Finder = () => {
       latitudeDelta: 0.005,
       longitudeDelta: 0.005,
     });
+    setSelectedPlace(place); // Update the selected place
     setSearchQuery("");  // Clears the search query
     setSearchResults([]);  // Clears the search results
   };
@@ -126,7 +124,7 @@ const Finder = () => {
             {searchResults.map((result, index) => (
               <TouchableOpacity
                 key={index}
-                onPress={() => handleSelectPlaceFromSearch(result)} // Clear search and zoom to place
+                onPress={() => handleSelectPlaceFromSearch(result)} // Select place from search
               >
                 <Text style={styles.resultItem}>{result.name}</Text>
               </TouchableOpacity>
@@ -135,7 +133,11 @@ const Finder = () => {
         )}
 
         {region && (
-          <MapView style={styles.map} region={region} onRegionChangeComplete={handleRegionChange}>
+          <MapView
+            style={styles.map}
+            region={region}
+            onRegionChangeComplete={handleRegionChange}
+          >
             {currentLocation && (
               <Marker
                 coordinate={{
@@ -145,30 +147,32 @@ const Finder = () => {
                 title="Your Location"
               />
             )}
-            {predefinedPlaces.map((result, index) => (
+            {predefinedPlaces.map((place) => (
               <Marker
-                key={index}
+                key={place.id}
                 coordinate={{
-                  latitude: result.latitude,
-                  longitude: result.longitude,
+                  latitude: place.latitude,
+                  longitude: place.longitude,
                 }}
-                title={result.name}
-                onPress={() => handleSelectPlaceFromMap(result)} // Show details when marker is clicked
+                title={place.name}
+                pinColor={selectedPlace && selectedPlace.id === place.id ? "blue" : "red"} // Highlight selected marker
+                onPress={() => handleSelectPlaceFromMap(place)}
               >
-                <Callout>
-                  <Text>{result.name}</Text>
-                </Callout>
+                {selectedPlace && selectedPlace.id === place.id && (
+                  <Callout>
+                    <Text>{place.name}</Text>
+                  </Callout>
+                )}
               </Marker>
             ))}
           </MapView>
         )}
 
-        {/* Modal to show location details when a pin is clicked */}
         {selectedPlace && showDetails && (
           <Modal
             visible={showDetails}
             animationType="slide"
-            onRequestClose={() => setShowDetails(false)} // Close the modal when the user presses back
+            onRequestClose={() => setShowDetails(false)}
           >
             <View style={styles.modalContainer}>
               <Text style={styles.modalTitle}>{selectedPlace.name}</Text>
