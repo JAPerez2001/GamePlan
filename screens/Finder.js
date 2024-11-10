@@ -8,9 +8,11 @@ import {
   TouchableOpacity,
   Text,
   Modal,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import * as Location from "expo-location";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, Callout } from "react-native-maps";
 import { useDebounce } from 'use-debounce'; // Added debounce hook
 
 const windowWidth = Dimensions.get("window").width;
@@ -36,25 +38,29 @@ const Finder = () => {
     { name: "UTD Tennis Courts", latitude: 32.9828, longitude: -96.7502 },
   ];
 
-
   useEffect(() => {
     const getLocation = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        console.log("Permission to access location was denied");
-        setLoading(false);
-        return;
-      }
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          console.log("Permission to access location was denied");
+          setLoading(false);
+          return;
+        }
 
-      let location = await Location.getCurrentPositionAsync({});
-      setCurrentLocation(location.coords);
-      setRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      });
-      setLoading(false);
+        let location = await Location.getCurrentPositionAsync({});
+        setCurrentLocation(location.coords);
+        setRegion({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        });
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching location", error);
+        setLoading(false);
+      }
     };
 
     getLocation();
@@ -82,6 +88,8 @@ const Finder = () => {
       latitudeDelta: 0.005,
       longitudeDelta: 0.005,
     });
+    setSearchQuery("");  // Clears the search query
+    setSearchResults([]);  // Clears the search results
   };
 
   const handleSelectPlaceFromMap = (place) => {
@@ -104,74 +112,77 @@ const Finder = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search for places"
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={styles.container}>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search for places"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
 
-      {searchResults.length > 0 && (
-        <View style={styles.resultsContainer}>
-          {searchResults.map((result, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => handleSelectPlaceFromSearch(result)} // Only update map region, no modal
-            >
-              <Text style={styles.resultItem}>{result.name}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
-
-      {region && (
-        <MapView style={styles.map} region={region} onRegionChangeComplete={handleRegionChange}>
-          {currentLocation && (
-            <Marker
-              coordinate={{
-                latitude: currentLocation.latitude,
-                longitude: currentLocation.longitude,
-              }}
-              title="Your Location"
-            />
-          )}
-          {predefinedPlaces.map((result, index) => (
-            <Marker
-              key={index}
-              coordinate={{
-                latitude: result.latitude,
-                longitude: result.longitude,
-              }}
-              title={result.name}
-              onPress={() => handleSelectPlaceFromMap(result)} // Show details when marker is clicked
-            />
-          ))}
-        </MapView>
-      )}
-
-      {/* Modal to show location details when a pin is clicked */}
-      {selectedPlace && showDetails && (
-        <Modal
-          visible={showDetails}
-          animationType="slide"
-          onRequestClose={() => setShowDetails(false)} // Close the modal when the user presses back
-        >
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>{selectedPlace.name}</Text>
-            <Text style={styles.modalDescription}>Booking Information:</Text>
-            <Text style={styles.modalDescription}>Availability: M W THU SUN</Text>
-            <Text style={styles.modalDescription}>Phone Number: +19728832111</Text>
-            <TouchableOpacity onPress={(addEvent) => setShowDetails(false)}>
-
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setShowDetails(false)}>
-              <Text style={styles.closeButton}>Close</Text>
-            </TouchableOpacity>
+        {searchResults.length > 0 && (
+          <View style={styles.resultsContainer}>
+            {searchResults.map((result, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => handleSelectPlaceFromSearch(result)} // Clear search and zoom to place
+              >
+                <Text style={styles.resultItem}>{result.name}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
-        </Modal>
-      )}
-    </View>
+        )}
+
+        {region && (
+          <MapView style={styles.map} region={region} onRegionChangeComplete={handleRegionChange}>
+            {currentLocation && (
+              <Marker
+                coordinate={{
+                  latitude: currentLocation.latitude,
+                  longitude: currentLocation.longitude,
+                }}
+                title="Your Location"
+              />
+            )}
+            {predefinedPlaces.map((result, index) => (
+              <Marker
+                key={index}
+                coordinate={{
+                  latitude: result.latitude,
+                  longitude: result.longitude,
+                }}
+                title={result.name}
+                onPress={() => handleSelectPlaceFromMap(result)} // Show details when marker is clicked
+              >
+                <Callout>
+                  <Text>{result.name}</Text>
+                </Callout>
+              </Marker>
+            ))}
+          </MapView>
+        )}
+
+        {/* Modal to show location details when a pin is clicked */}
+        {selectedPlace && showDetails && (
+          <Modal
+            visible={showDetails}
+            animationType="slide"
+            onRequestClose={() => setShowDetails(false)} // Close the modal when the user presses back
+          >
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>{selectedPlace.name}</Text>
+              <Text style={styles.modalDescription}>Booking Information:</Text>
+              <Text style={styles.modalDescription}>Availability: M W THU SUN</Text>
+              <Text style={styles.modalDescription}>Phone Number: +19728832111</Text>
+              <TouchableOpacity onPress={() => setShowDetails(false)}>
+                <Text style={styles.closeButton}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+        )}
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
