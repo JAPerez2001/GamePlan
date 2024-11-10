@@ -2,49 +2,59 @@ import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
-  TouchableOpacity,
   Text,
   Dimensions,
-  Image,
+  ActivityIndicator,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
-import { TextInput } from "react-native-gesture-handler";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 
 const Finder = () => {
   const [currentLocation, setCurrentLocation] = useState(null);
-  const [initialRegion, setInitialRegion] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [region, setRegion] = useState(null);
 
   useEffect(() => {
     const getLocation = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         console.log("Permission to access location was denied");
+        setLoading(false);
         return;
       }
 
       let location = await Location.getCurrentPositionAsync({});
       setCurrentLocation(location.coords);
 
-      setInitialRegion({
-        latitude: 32.9857,
-        longitude: 96.7502,
+      // Set the region to the user's current location once it's available
+      setRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
         latitudeDelta: 0.005,
         longitudeDelta: 0.005,
       });
+
+      setLoading(false);
     };
 
     getLocation();
   }, []);
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      {initialRegion && (
-        <MapView style={styles.map} initialRegion={initialRegion}>
+      {region && (
+        <MapView style={styles.map} region={region} onRegionChangeComplete={setRegion}>
           {currentLocation && (
             <Marker
               coordinate={{
@@ -69,6 +79,11 @@ const styles = StyleSheet.create({
   map: {
     width: "100%",
     height: "100%",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
