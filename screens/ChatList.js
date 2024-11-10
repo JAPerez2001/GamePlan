@@ -5,7 +5,7 @@ import { db } from '../firebase/firebaseConfig';
 
 const ChatList = ({ navigation, route }) => {
   const [chats, setChats] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');  // State to hold the search query
+  const [searchQuery, setSearchQuery] = useState(''); 
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'chats'), (snapshot) => {
@@ -22,7 +22,6 @@ const ChatList = ({ navigation, route }) => {
   const teamChats = chats.filter(chat => chat.type === 'team');
   const privateChats = chats.filter(chat => chat.type === 'private');
 
-  // Filter chats based on the search query
   const filteredTeamChats = teamChats.filter(chat =>
     chat.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -86,13 +85,13 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   searchInput: {
-    height: 45,  // Slightly larger height for more space
-    borderColor: '#888',  // Darker border color for better contrast
+    height: 45, 
+    borderColor: '#888',  
     borderWidth: 1,
-    borderRadius: 25,  // More rounded corners
+    borderRadius: 25, 
     paddingLeft: 15,
-    marginBottom: 15,  // Increased margin for better spacing
-    backgroundColor: '#e3e3e3',  // Light gray background for the input field
+    marginBottom: 15, 
+    backgroundColor: '#e3e3e3',  
   },
   chatItem: {
     flexDirection: 'row',
