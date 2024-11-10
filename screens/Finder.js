@@ -26,11 +26,11 @@ const Finder = () => {
   // Hardcoded practice locations
   const predefinedPlaces = [
     { name: "UTD Soccer Field 1", latitude: 32.9832, longitude: -96.7515 },
+    { name: "UTD Soccer Field 2", latitude: 32.9832, longitude: -96.7525 },
+    { name: "UTD Soccer Field 3", latitude: 32.9832, longitude: -96.7535 },
     { name: "UTD Soccer Field 4", latitude: 32.9820, longitude: -96.7518 },
-    { name: "Park", latitude: 32.9800, longitude: -96.7550 },
-    { name: "Gym", latitude: 32.9880, longitude: -96.7530 },
-    { name: "Library", latitude: 32.9825, longitude: -96.7545 },
-    { name: "Mall", latitude: 32.9870, longitude: -96.7520 },
+    { name: "UTD Soccer Field 5", latitude: 32.9820, longitude: -96.7528 },
+    { name: "UTD Tennis Courts", latitude: 32.9828, longitude: -96.7502 },
   ];
 
   useEffect(() => {
