@@ -162,6 +162,9 @@ const Finder = () => {
             <Text style={styles.modalDescription}>Booking Information:</Text>
             <Text style={styles.modalDescription}>Availability: M W THU SUN</Text>
             <Text style={styles.modalDescription}>Phone Number: +19728832111</Text>
+            <TouchableOpacity onPress={(addEvent) => setShowDetails(false)}>
+
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => setShowDetails(false)}>
               <Text style={styles.closeButton}>Close</Text>
             </TouchableOpacity>
