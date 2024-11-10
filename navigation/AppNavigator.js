@@ -9,6 +9,7 @@ import ChatStack from './ChatStack';
 import Calendar from '../screens/Calendar';
 import Finder from '../screens/Finder';
 import Profile from '../screens/Announcements';
+import Settings from '../screens/Settings';
 
 const Tab = createBottomTabNavigator();
 
@@ -59,6 +60,16 @@ export default function AppNavigator() {
             tabBarLabel: "Announcements",
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="bell" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Settings"
+          component={Settings}
+          options={{
+            tabBarLabel: "Settings",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="cog" color={color} size={size} />
             ),
           }}
         />
