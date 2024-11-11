@@ -51,7 +51,7 @@ function Conversation({ route, navigation }) {
         ),
         headerRight: () => (
           <MaterialCommunityIcons
-            name="bell" // Icon for announcements
+            name="bell" 
             size={24}
             color="black"
             style={styles.headerIcon}

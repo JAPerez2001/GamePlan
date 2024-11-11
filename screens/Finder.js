@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Image,
-  ScrollView, // Import ScrollView
+  ScrollView, 
 } from "react-native";
 import * as Location from "expo-location";
 import { useDebounce } from "use-debounce";
@@ -21,11 +21,11 @@ const Finder = ({ navigation }) => {
   const [region, setRegion] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
-  const [searchResults, setSearchResults] = useState([]); // Initialize with an empty array
+  const [searchResults, setSearchResults] = useState([]); 
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
 
- // Hardcoded locations with image URLs
+
   const predefinedPlaces = [
     {
       id: 1,
@@ -146,15 +146,15 @@ const Finder = ({ navigation }) => {
     if (debouncedSearchQuery !== "") {
       handleSearch(debouncedSearchQuery);
     } else {
-      setSearchResults([]); // Reset search results when query is empty
+      setSearchResults([]);
     }
   }, [debouncedSearchQuery]);
 
-  // Reset state when returning to the Finder screen
+
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      setSelectedPlace(null); // Reset selected place
-      setShowDetails(false);  // Close the details modal
+      setSelectedPlace(null); 
+      setShowDetails(false); 
     });
 
     return unsubscribe;
@@ -168,8 +168,8 @@ const Finder = ({ navigation }) => {
   };
 
   const handleSelectPlaceFromList = (place) => {
-    setSelectedPlace(place); // Set the selected place details
-    setShowDetails(true); // Show the details modal
+    setSelectedPlace(place);
+    setShowDetails(true);
   };
 
   if (loading) {
@@ -198,7 +198,7 @@ const Finder = ({ navigation }) => {
               {searchResults.map((result, index) => (
                 <TouchableOpacity
                   key={index}
-                  onPress={() => handleSelectPlaceFromList(result)} // Select place from search result
+                  onPress={() => handleSelectPlaceFromList(result)} 
                   style={styles.resultItemContainer}
                 >
                   <Image
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
   resultsContainer: {
     paddingHorizontal: 20,
     marginTop: 20,
-    flex: 1, // Ensures ScrollView takes up available space
+    flex: 1, 
   },
   resultItemContainer: {
     flexDirection: "row",
