@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Image,
-  ScrollView, 
+  ScrollView,
 } from "react-native";
 import * as Location from "expo-location";
 import { useDebounce } from "use-debounce";
@@ -21,10 +21,19 @@ const Finder = ({ navigation }) => {
   const [region, setRegion] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
-  const [searchResults, setSearchResults] = useState([]); 
+  const [searchResults, setSearchResults] = useState([]);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [utdPlaces, setUtdPlaces] = useState([]);
+  const [showUtdPlaces, setShowUtdPlaces] = useState(false); 
 
+  const handleShowUtdPlaces = () => {
+    const filteredPlaces = predefinedPlaces.filter((place) =>
+      place.name.toLowerCase().includes("utd")
+    );
+    setUtdPlaces(filteredPlaces);
+    setShowUtdPlaces(true); 
+  };
 
   const predefinedPlaces = [
     {
@@ -76,45 +85,45 @@ const Finder = ({ navigation }) => {
       description: "2400 Armstrong Dr, Richardson, TX 75080",
     },
     {
-        id: 7,
-        name: "UTD Baseball Field",
-        latitude: 32.981777801291784,
-        longitude: -96.74888962464104,
-        imageUrl: "https://lh5.googleusercontent.com/p/AF1QipPYbcmT4BLRs19coaVNkbhnNgoSEwUP8PmlYrp4=w408-h246-k-no",
-        description: "2015-2313 University Pkwy, Richardson, TX 75080",
-      },
-      {
-        id: 8,
-        name: "Cricket Grounds",
-        latitude: 32.97985181948951,
-        longitude:  -96.74949043945766,
-        imageUrl: "https://lh5.googleusercontent.com/p/AF1QipOMbkw2psPgSSp67EQaO04RpsDaOGAF2uWKv-2t=w408-h306-k-no",
-        description: "Richardson, TX 75080",
-      },
-      {
-        id: 9,
-        name: "UTD Basketball Courts",
-        latitude: 32.983667203179714,
-        longitude: -96.74958720117691,
-        imageUrl: "https://lh5.googleusercontent.com/p/AF1QipOpDK-boxOQOtEZIUowhAUST0Emxqjua0HhmOtn=w408-h544-k-no",
-        description: "University of Texas at Dallas, Richardson, TX 75080",
-      },
-      {
-        id: 10,
-        name: "Edgington Basketball Court",
-        latitude: 32.991364921239835,
-        longitude: -96.75244241956948,
-        imageUrl: "https://streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid=Owh6vvRR3sFo8Mc3Lmn0BQ&cb_client=search.gws-prod.gps&w=408&h=240&yaw=80.01974&pitch=0&thumbfov=100",
-        description: "Residence Hall North West, 950 N Loop Rd, Richardson, TX 75080",
-      },
-      {
-        id: 11,
-        name: "National Cricket League Stadium", 
-        latitude: 32.9808507962534, 
-        longitude: -96.74976788467279,
-        imageUrl: "https://streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid=HPT5i_KeumnBKnpFTOWy6w&cb_client=search.gws-prod.gps&w=408&h=240&yaw=87.441795&pitch=0&thumbfov=100",
-        description: "Residence Hall North West, 950 N Loop Rd, Richardson, TX 75080",
-      },
+      id: 7,
+      name: "UTD Baseball Field",
+      latitude: 32.981777801291784,
+      longitude: -96.74888962464104,
+      imageUrl: "https://lh5.googleusercontent.com/p/AF1QipPYbcmT4BLRs19coaVNkbhnNgoSEwUP8PmlYrp4=w408-h246-k-no",
+      description: "2015-2313 University Pkwy, Richardson, TX 75080",
+    },
+    {
+      id: 8,
+      name: "Cricket Grounds",
+      latitude: 32.97985181948951,
+      longitude: -96.74949043945766,
+      imageUrl: "https://lh5.googleusercontent.com/p/AF1QipOMbkw2psPgSSp67EQaO04RpsDaOGAF2uWKv-2t=w408-h306-k-no",
+      description: "Richardson, TX 75080",
+    },
+    {
+      id: 9,
+      name: "UTD Basketball Courts",
+      latitude: 32.983667203179714,
+      longitude: -96.74958720117691,
+      imageUrl: "https://lh5.googleusercontent.com/p/AF1QipOpDK-boxOQOtEZIUowhAUST0Emxqjua0HhmOtn=w408-h544-k-no",
+      description: "University of Texas at Dallas, Richardson, TX 75080",
+    },
+    {
+      id: 10,
+      name: "Edgington Basketball Court",
+      latitude: 32.991364921239835,
+      longitude: -96.75244241956948,
+      imageUrl: "https://streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid=Owh6vvRR3sFo8Mc3Lmn0BQ&cb_client=search.gws-prod.gps&w=408&h=240&yaw=80.01974&pitch=0&thumbfov=100",
+      description: "Residence Hall North West, 950 N Loop Rd, Richardson, TX 75080",
+    },
+    {
+      id: 11,
+      name: "National Cricket League Stadium",
+      latitude: 32.9808507962534,
+      longitude: -96.74976788467279,
+      imageUrl: "https://streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid=HPT5i_KeumnBKnpFTOWy6w&cb_client=search.gws-prod.gps&w=408&h=240&yaw=87.441795&pitch=0&thumbfov=100",
+      description: "Residence Hall North West, 950 N Loop Rd, Richardson, TX 75080",
+    },
   ];
 
   useEffect(() => {
@@ -150,11 +159,10 @@ const Finder = ({ navigation }) => {
     }
   }, [debouncedSearchQuery]);
 
-
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      setSelectedPlace(null); 
-      setShowDetails(false); 
+      setSelectedPlace(null);
+      setShowDetails(false);
     });
 
     return unsubscribe;
@@ -185,10 +193,31 @@ const Finder = ({ navigation }) => {
       <View style={styles.container}>
         <TextInput
           style={styles.searchBar}
-          placeholder="Search for places"
+          placeholder="Search by name..."
           value={searchQuery}
-          onChangeText={setSearchQuery}
+          onChangeText={(text) => {
+            setSearchQuery(text);
+            if (text === "") {
+              setShowUtdPlaces(false);
+            }
+          }}
         />
+
+        {/* Button to filter UTD places */}
+        {!showUtdPlaces && searchQuery === "" && (
+          <TouchableOpacity onPress={handleShowUtdPlaces} style={styles.filterButton}>
+            <Text style={styles.filterButtonText}>Use current location</Text>
+          </TouchableOpacity>
+        )}
+
+        {/* Display message before any search */}
+        {(searchQuery === "" && !showUtdPlaces) && (
+          <View style={styles.centerMessageContainer}>
+            <Text style={styles.centerMessageText}>
+              Try searching by sport type or field name. Example: "Soccer Field"
+            </Text>
+          </View>
+        )}
 
         {/* Make the list scrollable */}
         <ScrollView style={styles.resultsContainer}>
@@ -198,7 +227,29 @@ const Finder = ({ navigation }) => {
               {searchResults.map((result, index) => (
                 <TouchableOpacity
                   key={index}
-                  onPress={() => handleSelectPlaceFromList(result)} 
+                  onPress={() => handleSelectPlaceFromList(result)}
+                  style={styles.resultItemContainer}
+                >
+                  <Image
+                    source={{ uri: result.imageUrl }}
+                    style={styles.resultImage}
+                  />
+                  <View style={styles.resultTextContainer}>
+                    <Text style={styles.resultName}>{result.name}</Text>
+                    <Text style={styles.resultDescription}>{result.description}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+
+          {/* Show UTD filtered places if no search query and UTD places are enabled */}
+          {showUtdPlaces && searchQuery === "" && (
+            <View>
+              {utdPlaces.map((result, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => handleSelectPlaceFromList(result)}
                   style={styles.resultItemContainer}
                 >
                   <Image
@@ -223,33 +274,42 @@ const Finder = ({ navigation }) => {
         </ScrollView>
 
         {/* Details modal */}
-        {selectedPlace && showDetails && (
-          <Modal
-            visible={showDetails}
-            animationType="slide"
-            onRequestClose={() => setShowDetails(false)}
+{selectedPlace && showDetails && (
+  <Modal
+    visible={showDetails}
+    animationType="fade"
+    transparent={true}
+    onRequestClose={() => setShowDetails(false)}
+  >
+    <View style={styles.modalBackdrop}>
+      <View style={styles.modalContainer}>
+        <Text style={styles.modalTitle}>{selectedPlace.name}</Text>
+        <Text style={styles.modalDescription}>Booking Information:</Text>
+        <Text style={styles.modalDescription}>Availability: M W THU SUN</Text>
+        <Text style={styles.modalDescription}>Phone Number: +19728832111</Text>
+        
+        {/* Buttons side by side */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("Calendar", {
+                location: selectedPlace.name,
+                showCreateEventModal: true,
+              });
+            }}
+            style={styles.addEventButton}
           >
-            <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>{selectedPlace.name}</Text>
-              <Text style={styles.modalDescription}>Booking Information:</Text>
-              <Text style={styles.modalDescription}>Availability: M W THU SUN</Text>
-              <Text style={styles.modalDescription}>Phone Number: +19728832111</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate("Calendar", {
-                    location: selectedPlace.name,
-                    showCreateEventModal: true,
-                  });
-                }}
-              >
-                <Text style={styles.closeButton}>Add Event</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setShowDetails(false)}>
-                <Text style={styles.closeButton}>Close</Text>
-              </TouchableOpacity>
-            </View>
-          </Modal>
-        )}
+            <Text style={styles.addEventText}>Book Event Here</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity onPress={() => setShowDetails(false)} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  </Modal>
+)}
       </View>
     </TouchableWithoutFeedback>
   );
@@ -274,7 +334,7 @@ const styles = StyleSheet.create({
   resultsContainer: {
     paddingHorizontal: 20,
     marginTop: 20,
-    flex: 1, 
+    flex: 1,
   },
   resultItemContainer: {
     flexDirection: "row",
@@ -315,25 +375,93 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  modalContainer: {
+  centerMessageContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 20,
+    marginTop: 20,
+  },
+  centerMessageText: {
+    fontSize: 18,
+    color: "#888",
+    textAlign: "center",
+  },
+  filterButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: "#4fc3e3",
+    borderRadius: 20,
+    marginTop: 10,
+    marginHorizontal: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  filterButtonText: {
+    color: "#fff",
+    textAlign: "center",
+    fontSize: 14,
+  },
+  modalBackdrop: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.4)", 
+  },
+  modalContainer: {
+    width: '90%',  
+    backgroundColor: "#fff",
+    borderRadius: 10,
     padding: 20,
-    backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5, 
   },
   modalTitle: {
     fontSize: 22,
-    fontWeight: "bold",
+    fontWeight: "600", 
+    marginBottom: 10,
   },
   modalDescription: {
     fontSize: 16,
-    marginVertical: 20,
+    marginVertical: 10,
+    color: "#555",
+  },
+  buttonContainer: {
+    flexDirection: 'row',  
+    justifyContent: 'space-between',  
+    marginTop: 20,
+  },
+  addEventButton: {
+    backgroundColor: "#007bff",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius:8,
+    width: '48%',
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  addEventText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
   },
   closeButton: {
-    fontSize: 18,
-    color: "#e91e63",
-    marginTop: 10,
+    backgroundColor: "#ccc",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    width: '48%', 
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  closeButtonText: {
+    color: "#333",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 

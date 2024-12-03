@@ -30,7 +30,7 @@ const ChatList = ({ navigation, route }) => {
   );
 
   const data = [
-    { title: 'Team', data: filteredTeamChats },
+    { title: 'Team Chat', data: filteredTeamChats },
     { title: 'Private Chats', data: filteredPrivateChats },
   ];
 
