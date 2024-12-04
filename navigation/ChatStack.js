@@ -14,7 +14,7 @@ function ChatStackScreen({ navigation }) {
         name="ChatList"
         component={ChatList}
         options={{
-          title: 'Chats',  
+          title: 'Chat',  
         }}
       />
       <ChatStack.Screen 

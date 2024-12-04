@@ -60,7 +60,7 @@ export default function AppNavigator() {
           options={{
             tabBarLabel: "Announcements",
             tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="bell" color={color} size={size} />
+              <MaterialCommunityIcons name="bullhorn" color={color} size={size} />
             ),
           }}
         />
