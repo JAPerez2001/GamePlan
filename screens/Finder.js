@@ -1,17 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  View,
-  TextInput,
-  ActivityIndicator,
-  TouchableOpacity,
-  Text,
-  Modal,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Image,
-  ScrollView,
-} from "react-native";
+import { StyleSheet, View, TextInput, ActivityIndicator, TouchableOpacity, Text, Modal, TouchableWithoutFeedback, Keyboard, Image, ScrollView,} from "react-native";
 import * as Location from "expo-location";
 import { useDebounce } from "use-debounce";
 
@@ -25,14 +13,14 @@ const Finder = ({ navigation }) => {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
   const [utdPlaces, setUtdPlaces] = useState([]);
-  const [showUtdPlaces, setShowUtdPlaces] = useState(false); 
+  const [showUtdPlaces, setShowUtdPlaces] = useState(false);
 
   const handleShowUtdPlaces = () => {
     const filteredPlaces = predefinedPlaces.filter((place) =>
       place.name.toLowerCase().includes("utd")
     );
     setUtdPlaces(filteredPlaces);
-    setShowUtdPlaces(true); 
+    setShowUtdPlaces(true);
   };
 
   const predefinedPlaces = [
@@ -143,7 +131,7 @@ const Finder = ({ navigation }) => {
           longitudeDelta: 0.005,
         });
         setLoading(false);
-      } catch (error) {
+      } catch {
         setLoading(false);
       }
     };
@@ -153,9 +141,12 @@ const Finder = ({ navigation }) => {
 
   useEffect(() => {
     if (debouncedSearchQuery !== "") {
-      handleSearch(debouncedSearchQuery);
+      setSearchResults(predefinedPlaces.filter((place) =>
+        place.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+      ));
     } else {
       setSearchResults([]);
+      setShowUtdPlaces(false);  
     }
   }, [debouncedSearchQuery]);
 
@@ -164,16 +155,8 @@ const Finder = ({ navigation }) => {
       setSelectedPlace(null);
       setShowDetails(false);
     });
-
     return unsubscribe;
   }, [navigation]);
-
-  const handleSearch = (query) => {
-    const results = predefinedPlaces.filter((place) =>
-      place.name.toLowerCase().includes(query.toLowerCase())
-    );
-    setSearchResults(results);
-  };
 
   const handleSelectPlaceFromList = (place) => {
     setSelectedPlace(place);
@@ -195,274 +178,102 @@ const Finder = ({ navigation }) => {
           style={styles.searchBar}
           placeholder="Search by name..."
           value={searchQuery}
-          onChangeText={(text) => {
-            setSearchQuery(text);
-            if (text === "") {
-              setShowUtdPlaces(false);
-            }
-          }}
+          onChangeText={setSearchQuery}
         />
-
-        {/* Button to filter UTD places */}
-        {!showUtdPlaces && searchQuery === "" && (
+        {!showUtdPlaces && !searchQuery && (
           <TouchableOpacity onPress={handleShowUtdPlaces} style={styles.filterButton}>
             <Text style={styles.filterButtonText}>Use current location</Text>
           </TouchableOpacity>
         )}
-
-        {/* Display message before any search */}
-        {(searchQuery === "" && !showUtdPlaces) && (
+        {searchQuery === "" && !showUtdPlaces && (
           <View style={styles.centerMessageContainer}>
-            <Text style={styles.centerMessageText}>
-              Try searching by sport type or field name. Example: "Soccer Field"
-            </Text>
+            <Text style={styles.centerMessageText}>Try searching by sport type or field name. Ex: "Baseball Field"</Text>
           </View>
         )}
-
-        {/* Make the list scrollable */}
         <ScrollView style={styles.resultsContainer}>
-          {/* Show search results if query is provided */}
-          {debouncedSearchQuery && searchResults.length > 0 && (
-            <View>
-              {searchResults.map((result, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => handleSelectPlaceFromList(result)}
-                  style={styles.resultItemContainer}
-                >
-                  <Image
-                    source={{ uri: result.imageUrl }}
-                    style={styles.resultImage}
-                  />
-                  <View style={styles.resultTextContainer}>
-                    <Text style={styles.resultName}>{result.name}</Text>
-                    <Text style={styles.resultDescription}>{result.description}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          {/* Show UTD filtered places if no search query and UTD places are enabled */}
-          {showUtdPlaces && searchQuery === "" && (
-            <View>
-              {utdPlaces.map((result, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => handleSelectPlaceFromList(result)}
-                  style={styles.resultItemContainer}
-                >
-                  <Image
-                    source={{ uri: result.imageUrl }}
-                    style={styles.resultImage}
-                  />
-                  <View style={styles.resultTextContainer}>
-                    <Text style={styles.resultName}>{result.name}</Text>
-                    <Text style={styles.resultDescription}>{result.description}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          {/* Show message if no results found */}
+          {(debouncedSearchQuery && searchResults.length > 0) && searchResults.map((result, index) => (
+            <TouchableOpacity key={index} onPress={() => handleSelectPlaceFromList(result)} style={styles.resultItemContainer}>
+              <Image source={{ uri: result.imageUrl }} style={styles.resultImage} />
+              <View style={styles.resultTextContainer}>
+                <Text style={styles.resultName}>{result.name}</Text>
+                <Text style={styles.resultDescription}>{result.description}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+          {showUtdPlaces && !searchQuery && utdPlaces.map((result, index) => (
+            <TouchableOpacity key={index} onPress={() => handleSelectPlaceFromList(result)} style={styles.resultItemContainer}>
+              <Image source={{ uri: result.imageUrl }} style={styles.resultImage} />
+              <View style={styles.resultTextContainer}>
+                <Text style={styles.resultName}>{result.name}</Text>
+                <Text style={styles.resultDescription}>{result.description}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
           {debouncedSearchQuery && searchResults.length === 0 && (
             <View style={styles.noResultsContainer}>
               <Text style={styles.noResultsText}>No results found</Text>
             </View>
           )}
         </ScrollView>
-
-        {/* Details modal */}
-{selectedPlace && showDetails && (
-  <Modal
-    visible={showDetails}
-    animationType="fade"
-    transparent={true}
-    onRequestClose={() => setShowDetails(false)}
-  >
-    <View style={styles.modalBackdrop}>
-      <View style={styles.modalContainer}>
-        <Text style={styles.modalTitle}>{selectedPlace.name}</Text>
-        <Text style={styles.modalDescription}>Booking Information:</Text>
-        <Text style={styles.modalDescription}>Availability: M W THU SUN</Text>
-        <Text style={styles.modalDescription}>Phone Number: +19728832111</Text>
-        
-        {/* Buttons side by side */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("Calendar", {
-                location: selectedPlace.name,
-                showCreateEventModal: true,
-              });
-            }}
-            style={styles.addEventButton}
-          >
-            <Text style={styles.addEventText}>Book Event Here</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity onPress={() => setShowDetails(false)} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>Close</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
-  </Modal>
-)}
+        {selectedPlace && showDetails && (
+          <Modal visible={showDetails} animationType="fade" transparent={true} onRequestClose={() => setShowDetails(false)}>
+            <View style={styles.modalBackdrop}>
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalTitle}>{selectedPlace.name}</Text>
+                <Text style={styles.modalDescription}>Booking Information:</Text>
+                <Text style={styles.modalDescription}>Availability: M W THU SUN</Text>
+                <Text style={styles.modalDescription}>Phone Number: +19728832111</Text>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate("Calendar", {
+                        location: selectedPlace.name,
+                        showCreateEventModal: true,
+                      });
+                    }}
+                    style={styles.addEventButton}
+                  >
+                    <Text style={styles.addEventText}>Book Event Here</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setShowDetails(false)} style={styles.closeButton}>
+                    <Text style={styles.closeButtonText}>Close</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
       </View>
     </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 20,
-  },
-  searchBar: {
-    height: 40,
-    borderColor: "#ddd",
-    borderWidth: 1,
-    borderRadius: 5,
-    marginTop: 10,
-    marginHorizontal: 20,
-    paddingHorizontal: 10,
-    fontSize: 16,
-    backgroundColor: "#fff",
-  },
-  resultsContainer: {
-    paddingHorizontal: 20,
-    marginTop: 20,
-    flex: 1,
-  },
-  resultItemContainer: {
-    flexDirection: "row",
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderColor: "#ddd",
-    marginBottom: 10,
-    alignItems: "center",
-  },
-  resultImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
-    marginRight: 15,
-  },
-  resultTextContainer: {
-    flex: 1,
-  },
-  resultName: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  resultDescription: {
-    fontSize: 14,
-    color: "#555",
-  },
-  noResultsContainer: {
-    paddingHorizontal: 20,
-    marginTop: 20,
-    alignItems: "center",
-  },
-  noResultsText: {
-    fontSize: 16,
-    color: "#888",
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  centerMessageContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    marginTop: 20,
-  },
-  centerMessageText: {
-    fontSize: 18,
-    color: "#888",
-    textAlign: "center",
-  },
-  filterButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: "#4fc3e3",
-    borderRadius: 20,
-    marginTop: 10,
-    marginHorizontal: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  filterButtonText: {
-    color: "#fff",
-    textAlign: "center",
-    fontSize: 14,
-  },
-  modalBackdrop: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.4)", 
-  },
-  modalContainer: {
-    width: '90%',  
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5, 
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: "600", 
-    marginBottom: 10,
-  },
-  modalDescription: {
-    fontSize: 16,
-    marginVertical: 10,
-    color: "#555",
-  },
-  buttonContainer: {
-    flexDirection: 'row',  
-    justifyContent: 'space-between',  
-    marginTop: 20,
-  },
-  addEventButton: {
-    backgroundColor: "#007bff",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius:8,
-    width: '48%',
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  addEventText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  closeButton: {
-    backgroundColor: "#ccc",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    width: '48%', 
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  closeButtonText: {
-    color: "#333",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+  container: { flex: 1, paddingTop: 20 },
+  searchBar: { height: 40, borderColor: "#ddd", borderWidth: 1, borderRadius: 5, marginTop: 10, marginHorizontal: 20, paddingHorizontal: 10, fontSize: 16, backgroundColor: "#fff" },
+  resultsContainer: { paddingHorizontal: 20, marginTop: 20, flex: 1 },
+  resultItemContainer: { flexDirection: "row", paddingVertical: 15, borderBottomWidth: 1, borderColor: "#ddd", marginBottom: 10, alignItems: "center" },
+  resultImage: { width: 80, height: 80, borderRadius: 10, marginRight: 15 },
+  resultTextContainer: { flex: 1 },
+  resultName: { fontSize: 18, fontWeight: "bold" },
+  resultDescription: { fontSize: 14, color: "#555" },
+  noResultsContainer: { paddingHorizontal: 20, marginTop: 20, alignItems: "center" },
+  noResultsText: { fontSize: 16, color: "#888" },
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+  centerMessageContainer: { flex: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 20, marginTop: 20 },
+  centerMessageText: { fontSize: 18, color: "#888", textAlign: "center" },
+  filterButton: { paddingVertical: 8, paddingHorizontal: 12, backgroundColor: "#007bff", borderRadius: 20, marginTop: 10, marginHorizontal: 20, alignItems: "center" },
+  filterButtonText: { color: "#fff", fontSize: 16 },
+  modalBackdrop: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.5)" },
+  modalContainer: { width: "80%", backgroundColor: "#fff", padding: 20, borderRadius: 10 },
+  modalTitle: { fontSize: 20, fontWeight: "bold", marginBottom: 10 },
+  modalDescription: { fontSize: 16, marginBottom: 5 },
+  buttonContainer: { marginTop: 20 },
+  addEventButton: { backgroundColor: "#007bff", paddingVertical: 12, paddingHorizontal: 20, borderRadius: 5, marginBottom: 10 },
+  addEventText: { color: "#fff", textAlign: "center", fontSize: 16, fontWeight: 'bold', },
+  closeButton: { paddingVertical: 12, paddingHorizontal: 20, borderRadius: 5, backgroundColor: "#ccc" },
+  closeButtonText: { color: "#333", textAlign: "center", fontSize: 16, fontWeight: 'bold', },
 });
 
 export default Finder;
+

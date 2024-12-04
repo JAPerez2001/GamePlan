@@ -1,13 +1,5 @@
-import React, { useState, useLayoutEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Modal,
-  StyleSheet,
-  Alert,
-} from 'react-native';
+import React, { useState, useLayoutEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Modal, StyleSheet, Alert, } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
@@ -17,7 +9,7 @@ const sampleAnnouncements = [
     title: "Practice Canceled",
     description: "Today's practice is canceled due to weather.",
     postedTime: "10:00 AM",
-    date: "2024-12-02", 
+    date: "2024-12-03",
   },
   {
     id: 2,
@@ -34,14 +26,13 @@ function Announcements() {
   const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [announcements, setAnnouncements] = useState(sampleAnnouncements);
-
   const [editMode, setEditMode] = useState(false);
   const [selectedAnnouncements, setSelectedAnnouncements] = useState([]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => setEditMode(!editMode)}>
+        <TouchableOpacity onPress={() => setEditMode(prev => !prev)}>
           <Text style={styles.editButton}>{editMode ? "Done" : "Edit"}</Text>
         </TouchableOpacity>
       ),
@@ -51,13 +42,13 @@ function Announcements() {
   const handleAddAnnouncement = () => {
     if (newTitle && newDescription) {
       const newAnnouncement = {
+
         id: announcements.length + 1,
         title: newTitle,
         description: newDescription,
         postedTime: new Date().toLocaleTimeString([], { hour: 'numeric', minute: 'numeric', hour12: true }),
         date: new Date().toISOString().split('T')[0],
       };
-
       setAnnouncements([newAnnouncement, ...announcements]);
       setNewTitle('');
       setNewDescription('');
@@ -68,24 +59,19 @@ function Announcements() {
   };
 
   const handleSelectAnnouncement = (id) => {
-    if (selectedAnnouncements.includes(id)) {
-      setSelectedAnnouncements(selectedAnnouncements.filter((selectedId) => selectedId !== id));
-    } else {
-      setSelectedAnnouncements([...selectedAnnouncements, id]);
-    }
+    setSelectedAnnouncements(prev =>
+      prev.includes(id) ? prev.filter(selectedId => selectedId !== id) : [...prev, id]
+    );
   };
 
   const handleDeleteAnnouncements = () => {
-    setAnnouncements(announcements.filter((announcement) => !selectedAnnouncements.includes(announcement.id)));
+    setAnnouncements(announcements.filter(announcement => !selectedAnnouncements.includes(announcement.id)));
     setSelectedAnnouncements([]);
     setEditMode(false);
   };
 
   const isPastDate = (date) => {
-    const today = new Date();
-    const announcementDate = new Date(date);
-    const oneDayAgo = new Date(today.setDate(today.getDate() - 1));
-    return announcementDate < oneDayAgo;
+    return new Date(date) < new Date(new Date().setDate(new Date().getDate() - 1));
   };
 
   return (
@@ -98,39 +84,26 @@ function Announcements() {
               styles.bubbleBox,
               editMode && styles.editModeBubbleBox,
               editMode && selectedAnnouncements.includes(announcement.id) && styles.selectedBubbleBox,
-              isPastDate(announcement.date) && styles.dimmedBubbleBox, // Dim the past announcements
+              isPastDate(announcement.date) && styles.dimmedBubbleBox,
             ]}
             onPress={() => editMode && handleSelectAnnouncement(announcement.id)}
           >
-            <Text style={[
-              styles.title,
-              isPastDate(announcement.date) && styles.dimmedText, // Dim the title text
-            ]}>
+            <Text style={[styles.title, isPastDate(announcement.date) && styles.dimmedText]}>
               {announcement.title}
             </Text>
-            <Text style={[
-              styles.description,
-              isPastDate(announcement.date) && styles.dimmedText, // Dim the description text
-            ]}>
+            <Text style={[styles.description, isPastDate(announcement.date) && styles.dimmedText]}>
               {announcement.description}
             </Text>
-            <Text style={[
-              styles.time,
-              isPastDate(announcement.date) && styles.dimmedText, // Dim the time text
-            ]}>
+            <Text style={[styles.time, isPastDate(announcement.date) && styles.dimmedText]}>
               {announcement.postedTime}
             </Text>
-            <Text style={[
-              styles.date,
-              isPastDate(announcement.date) && styles.dimmedText, // Dim the date text
-            ]}>
+            <Text style={[styles.date, isPastDate(announcement.date) && styles.dimmedText]}>
               {announcement.date}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      {/* Floating Action Button */}
       <TouchableOpacity
         style={styles.fab}
         onPress={editMode ? handleDeleteAnnouncements : () => setModalVisible(true)}
@@ -144,7 +117,7 @@ function Announcements() {
 
       <Modal
         animationType="fade"
-        transparent={true}
+        transparent
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
@@ -152,29 +125,23 @@ function Announcements() {
           <View style={styles.popupContainer}>
             <Text style={styles.modalTitle}>Add Announcement</Text>
             <TextInput
-              placeholder="Title"
+              placeholder="Title (Ex: Match tomorrow!)"
               value={newTitle}
               onChangeText={setNewTitle}
               style={styles.input}
             />
             <TextInput
-              placeholder="Description"
+              placeholder="Description (Meeting place, time, date, etc.)"
               value={newDescription}
               onChangeText={setNewDescription}
               multiline
-              style={[styles.input, styles.descriptionInput]}
+              style={[styles.input, styles.descriptionInput]} // Keep description input style
             />
             <View style={styles.modalActions}>
-              <TouchableOpacity
-                onPress={handleAddAnnouncement}
-                style={styles.addButton}
-              >
+              <TouchableOpacity onPress={handleAddAnnouncement} style={styles.addButton}>
                 <Text style={styles.addButtonText}>Add</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setModalVisible(false)}
-                style={styles.cancelButton}
-              >
+              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.cancelButton}>
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
             </View>
@@ -186,141 +153,42 @@ function Announcements() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  bubbleContainer: {
-    width: '90%',
-    padding: 10,
-  },
+  container: { flex: 1, padding: 20 },
+  bubbleContainer: { width: '90%', padding: 10 },
   bubbleBox: {
-    backgroundColor: '#ffffff',
-    borderRadius: 15,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 5,
+    backgroundColor: '#fff', borderRadius: 15, padding: 15, marginBottom: 10,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 3, elevation: 5
   },
-  selectedBubbleBox: {
-    backgroundColor: '#f8d7da',
-    borderWidth: 2,
-    borderColor: '#f5c6cb',
-  },
-  editModeBubbleBox: {
-    borderWidth: 2,
-    borderColor: '#007bff',
-  },
-  dimmedBubbleBox: {
-    backgroundColor: '#e0e0e0', 
-  },
-  dimmedText: {
-    color: '#888',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  description: {
-    fontSize: 14,
-    color: '#666',
-    marginVertical: 5,
-  },
-  time: {
-    fontSize: 12,
-    color: '#aaa',
-    textAlign: 'right',
-  },
-  date: {
-    fontSize: 12,
-    color: '#bbb',
-    textAlign: 'right',
-    fontWeight: 'bold',
-  },
+  selectedBubbleBox: { backgroundColor: '#f8d7da', borderWidth: 2, borderColor: '#f5c6cb' },
+  editModeBubbleBox: { borderWidth: 2, borderColor: '#007bff' },
+  dimmedBubbleBox: { backgroundColor: '#e0e0e0' },
+  dimmedText: { color: '#888' },
+  title: { fontSize: 18, fontWeight: 'bold' },
+  description: { fontSize: 14, color: '#666', marginVertical: 5 },
+  time: { fontSize: 12, color: '#aaa', textAlign: 'right' },
+  date: { fontSize: 12, color: '#bbb', textAlign: 'right', fontWeight: 'bold' },
   fab: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    backgroundColor: '#e91e63',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 5,
+    position: 'absolute', bottom: 20, right: 20, backgroundColor: '#e91e63', width: 60, height: 60, borderRadius: 30,
+    alignItems: 'center', justifyContent: 'center', elevation: 5
   },
-  editButton: {
-    fontSize: 18,
-    color: '#007bff',
-    marginRight: 15,
-  },
-  modalBackdrop: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
+  editButton: { fontSize: 18, color: '#007bff', marginRight: 15 },
+  modalBackdrop: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' },
   popupContainer: {
-    width: '80%',
-    backgroundColor: '#ffffff',
-    borderRadius: 15,
-    padding: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 10,
+    width: '80%', backgroundColor: '#fff', borderRadius: 15, padding: 20, alignItems: 'center',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 5, elevation: 10
   },
-  input: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 15,
-  },
-  descriptionInput: {
-    height: 80,
-    textAlignVertical: 'top',
-  },
-  modalActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
+  input: { width: '100%', borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 10, marginBottom: 15 },
+  descriptionInput: { height: 240, textAlignVertical: 'top' },
+  modalActions: { flexDirection: 'row', justifyContent: 'space-between', width: '100%' },
   addButton: {
-    backgroundColor: '#007bff',
-    padding: 10,
-    borderRadius: 8,
-    flex: 1,
-    marginRight: 5,
-    alignItems: 'center',
+    backgroundColor: '#007bff', padding: 10, borderRadius: 8, flex: 1, marginRight: 5, alignItems: 'center'
   },
-  addButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
+  addButtonText: { color: '#fff', fontWeight: 'bold' },
   cancelButton: {
-    backgroundColor: '#ccc',
-    padding: 10,
-    borderRadius: 8,
-    flex: 1,
-    marginLeft: 5,
-    alignItems: 'center',
+    backgroundColor: '#ccc', padding: 10, borderRadius: 8, flex: 1, marginLeft: 5, alignItems: 'center'
   },
-  cancelButtonText: {
-    color: '#333',
-    fontWeight: 'bold',
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
+  cancelButtonText: { color: '#333', fontWeight: 'bold' },
+  modalTitle: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 }
 });
 
 export default Announcements;
