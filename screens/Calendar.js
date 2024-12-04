@@ -32,14 +32,6 @@ function Calendar({ route, navigation }) {
         }
     };
 
-    const renderEmptyData = (date) => {
-        return (
-            <View style={{ height: 40, justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={{ color: 'grey' }}>{date ? date.day : ''}</Text>
-            </View>
-        );
-    };
-
     useEffect(() => {
         navigation.setOptions({
             headerRight: () => (
@@ -54,7 +46,7 @@ function Calendar({ route, navigation }) {
         <SafeAreaView style={styles.container}>
             <Agenda
                 items={items}
-                renderItem={(item) => (
+                renderItem={(item, firstItemInDay) => (
                     <TouchableOpacity style={styles.item}>
                         <Text style={styles.itemText}>{item.name}</Text>
                         <Text style={styles.itemText}>{item.data}</Text>
@@ -65,9 +57,17 @@ function Calendar({ route, navigation }) {
                     const newItems = { ...items };
                     setItems(newItems);
                 }}
-                renderEmptyData={(date) => (
-                    <Text style={styles.emptyEventText}>No event today</Text>
-                )}
+                renderEmptyData={() => {
+                    return <View>
+                        <Text style={styles.emptyEventText}>No events today</Text>
+                    </View>;
+                }}
+                loadItemsForMonth={month => {
+                    console.log('trigger items loading');
+                }}
+                onCalendarToggeld={calendarOpened => {
+                    console.log(calendarOpened);
+                }}
             />
 
             <Modal
@@ -149,7 +149,8 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: 'gray',
         justifyContent: 'center',
-        padding: 130,
+        padding: 120,
+        paddingTop: 150,
     }
 });
 
