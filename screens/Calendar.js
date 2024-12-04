@@ -1,44 +1,42 @@
-// /screens/Calendar.js
-import React, {useState, useEffect} from 'react';
-import {Text, View, StyleSheet, TouchableOpacity, Modal, TextInput, Button} from 'react-native';
-import {Agenda} from 'react-native-calendars';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import React, { useState, useEffect } from 'react';
+import { Text, View, StyleSheet, TouchableOpacity, Modal, TextInput, Button } from 'react-native';
+import { Agenda } from 'react-native-calendars';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-function Calendar({route, navigation}) {
-    const {showCreateEventModal, location} = route.params || {}
+function Calendar({ route, navigation }) {
+    const { showCreateEventModal, location } = route.params || {};
     const [items, setItems] = useState({
-        '2024-11-9': [{name: 'Practice', data: '@UTD campus'}],
-        '2024-11-10': [{name: 'Tournament', data: '@UTD campus'}]
+        '2024-11-9': [{ name: 'Practice', data: '@UTD campus' }],
+        '2024-11-10': [{ name: 'Tournament', data: '@UTD campus' }]
     });
 
     const [modalVisible, setModalVisible] = useState(!!showCreateEventModal);
-    const [newEvent, setNewEvent] = useState({name: '', data: location ?? '',});
+    const [newEvent, setNewEvent] = useState({ name: '', data: location ?? '' });
     const newDate = new Date();
     const [selectedDate, setSelectedDate] = useState(`${newDate.getFullYear()}-${newDate.getMonth() + 1}-${newDate.getDate()}`);
     const [showDate, setShowDate] = useState(false);
 
-
-  const addEvent = () => {
-    if (newEvent.name && selectedDate) {
-      const newItems = {
-        ...items,
-        [selectedDate]: [...(items[selectedDate] || []), { 
-          name: newEvent.name, 
-          data: newEvent.data || ' ' 
-        }]
-      };
-      setItems(newItems);
-      setNewEvent({ name: '', data: '' });
-      setModalVisible(false);
-    }
-  };
+    const addEvent = () => {
+        if (newEvent.name && selectedDate) {
+            const newItems = {
+                ...items,
+                [selectedDate]: [...(items[selectedDate] || []), {
+                    name: newEvent.name,
+                    data: newEvent.data || ' '
+                }]
+            };
+            setItems(newItems);
+            setNewEvent({ name: '', data: '' });
+            setModalVisible(false);
+        }
+    };
 
     useEffect(() => {
         navigation.setOptions({
             headerRight: () => (
-                <TouchableOpacity onPress={() => setModalVisible(true)} style={{marginRight: 20}}>
-                    <Text style={{fontSize: 30}}>+</Text>
+                <TouchableOpacity onPress={() => setModalVisible(true)} style={{ marginRight: 20 }}>
+                    <Text style={{ fontSize: 30 }}>+</Text>
                 </TouchableOpacity>
             ),
         });
@@ -48,7 +46,7 @@ function Calendar({route, navigation}) {
         <SafeAreaView style={styles.container}>
             <Agenda
                 items={items}
-                renderItem={(item) => (
+                renderItem={(item, firstItemInDay) => (
                     <TouchableOpacity style={styles.item}>
                         <Text style={styles.itemText}>{item.name}</Text>
                         <Text style={styles.itemText}>{item.data}</Text>
@@ -56,8 +54,19 @@ function Calendar({route, navigation}) {
                 )}
                 onDayPress={(day) => {
                     setSelectedDate(day.dateString);
-                    const newItems = {...items};
+                    const newItems = { ...items };
                     setItems(newItems);
+                }}
+                renderEmptyData={() => {
+                    return <View>
+                        <Text style={styles.emptyEventText}>No events today</Text>
+                    </View>;
+                }}
+                loadItemsForMonth={month => {
+                    console.log('trigger items loading');
+                }}
+                onCalendarToggeld={calendarOpened => {
+                    console.log(calendarOpened);
                 }}
             />
 
@@ -68,17 +77,17 @@ function Calendar({route, navigation}) {
                 onRequestClose={() => setModalVisible(false)}
             >
                 <View style={styles.modalContainer}>
-                    <Text style={{textAlign: 'center', fontSize: 24, padding: 10}}>Add Event</Text>
+                    <Text style={{ textAlign: 'center', fontSize: 24, padding: 10 }}>Add Event</Text>
                     <Text>Event Name:</Text>
                     <TextInput
                         placeholder="Event Name"
                         value={newEvent.name}
-                        onChangeText={(text) => setNewEvent({...newEvent, name: text})}
+                        onChangeText={(text) => setNewEvent({ ...newEvent, name: text })}
                         style={styles.input}
                     />
 
-                    <Text style={{marginBottom: 5}}>Date:</Text>
-                    <Text style={{marginBottom: 10, color: '#2196f3'}} onPress={() => setShowDate(true)}>{selectedDate.toString()}</Text>
+                    <Text style={{ marginBottom: 5 }}>Date:</Text>
+                    <Text style={{ marginBottom: 10, color: '#2196f3' }} onPress={() => setShowDate(true)}>{selectedDate.toString()}</Text>
                     {
                         showDate &&
                         <DateTimePicker
@@ -95,12 +104,12 @@ function Calendar({route, navigation}) {
                     <TextInput
                         placeholder="Location (Optional)"
                         value={newEvent.data}
-                        onChangeText={(text) => setNewEvent({...newEvent, data: text})}
+                        onChangeText={(text) => setNewEvent({ ...newEvent, data: text })}
                         style={styles.input}
                     />
 
-                    <Button title="Add Event" onPress={addEvent}/>
-                    <Button title="Cancel" onPress={() => setModalVisible(false)}/>
+                    <Button title="Add Event" onPress={addEvent} />
+                    <Button title="Cancel" onPress={() => setModalVisible(false)} />
                 </View>
             </Modal>
         </SafeAreaView>
@@ -135,8 +144,14 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         padding: 10,
         marginBottom: 10,
+    },
+    emptyEventText: {
+        fontSize: 20,
+        color: 'gray',
+        justifyContent: 'center',
+        padding: 120,
+        paddingTop: 150,
     }
-
 });
 
 export default Calendar;
