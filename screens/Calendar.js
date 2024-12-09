@@ -71,45 +71,54 @@ function Calendar({ route, navigation }) {
             />
 
             <Modal
-                animationType="slide"
-                transparent={false}
+                animationType="fade"
+                transparent={true}
                 visible={modalVisible}
                 onRequestClose={() => setModalVisible(false)}
             >
-                <View style={styles.modalContainer}>
-                    <Text style={{ textAlign: 'center', fontSize: 24, padding: 10 }}>Add Event</Text>
-                    <Text>Event Name:</Text>
-                    <TextInput
-                        placeholder="Event Name"
-                        value={newEvent.name}
-                        onChangeText={(text) => setNewEvent({ ...newEvent, name: text })}
-                        style={styles.input}
-                    />
-
-                    <Text style={{ marginBottom: 5 }}>Date:</Text>
-                    <Text style={{ marginBottom: 10, color: '#2196f3' }} onPress={() => setShowDate(true)}>{selectedDate.toString()}</Text>
-                    {
-                        showDate &&
-                        <DateTimePicker
-                            value={new Date(selectedDate)}
-                            mode={'date'}
-                            onChange={(_, newDate) => {
-                                setSelectedDate(`${newDate.getFullYear()}-${newDate.getMonth() + 1}-${newDate.getDate()}`);
-                                setShowDate(false);
-                            }}
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContainer}>
+                        <Text style={styles.modalTitle}>Add Event</Text>
+                        <Text style={styles.modalLabel}>Event Name:</Text>
+                        <TextInput
+                            placeholder="Event Name"
+                            value={newEvent.name}
+                            onChangeText={(text) => setNewEvent({ ...newEvent, name: text })}
+                            style={styles.input}
                         />
-                    }
 
-                    <Text>Location (optional):</Text>
-                    <TextInput
-                        placeholder="Location (Optional)"
-                        value={newEvent.data}
-                        onChangeText={(text) => setNewEvent({ ...newEvent, data: text })}
-                        style={styles.input}
-                    />
+                        <Text style={styles.modalLabel}>Date:</Text>
+                        <TouchableOpacity onPress={() => setShowDate(true)} style={styles.dateButton}>
+                            <Text style={styles.dateText}>{selectedDate}</Text>
+                        </TouchableOpacity>
+                        {showDate && (
+                            <DateTimePicker
+                                value={new Date(selectedDate)}
+                                mode={'date'}
+                                onChange={(_, newDate) => {
+                                    setSelectedDate(`${newDate.getFullYear()}-${newDate.getMonth() + 1}-${newDate.getDate()}`);
+                                    setShowDate(false);
+                                }}
+                            />
+                        )}
 
-                    <Button title="Add Event" onPress={addEvent} />
-                    <Button title="Cancel" onPress={() => setModalVisible(false)} />
+                        <Text style={styles.modalLabel}>Location (optional):</Text>
+                        <TextInput
+                            placeholder="Location (Optional)"
+                            value={newEvent.data}
+                            onChangeText={(text) => setNewEvent({ ...newEvent, data: text })}
+                            style={styles.input}
+                        />
+
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity style={styles.button} onPress={addEvent}>
+                                <Text style={styles.buttonText}>Add Event</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={() => setModalVisible(false)}>
+                                <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                 </View>
             </Modal>
         </SafeAreaView>
@@ -122,28 +131,82 @@ const styles = StyleSheet.create({
     },
     item: {
         backgroundColor: 'lightblue',
-        flex: 1,
-        borderRadius: 5,
-        padding: 10,
+        borderRadius: 10,
+        padding: 15,
         marginRight: 10,
-        marginTop: 25,
+        marginTop: 20,
         paddingBottom: 20,
+        elevation: 5,
     },
     itemText: {
         color: 'black',
-        fontSize: 14,
+        fontSize: 16,
     },
-    modalContainer: {
+    modalOverlay: {
         flex: 1,
         justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContainer: {
+        backgroundColor: 'white',
+        borderRadius: 10,
+        width: '90%',
         padding: 20,
+        elevation: 10,
+    },
+    modalTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    modalLabel: {
+        fontSize: 16,
+        marginBottom: 5,
     },
     input: {
         borderWidth: 1,
-        borderColor: 'gray',
-        borderRadius: 5,
+        borderColor: '#ddd',
+        borderRadius: 8,
         padding: 10,
-        marginBottom: 10,
+        marginBottom: 15,
+        fontSize: 16,
+    },
+    dateButton: {
+        marginBottom: 15,
+        backgroundColor: '#f0f0f0',
+        padding: 10,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    dateText: {
+        fontSize: 16,
+        color: '#2196f3',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    button: {
+        backgroundColor: '#007bff',
+        borderRadius: 8,
+        padding: 10,
+        flex: 1,
+        alignItems: 'center',
+        marginRight: 5,
+    },
+    cancelButton: {
+        backgroundColor: '#ccc',
+        marginRight: 0,
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    cancelButtonText: {
+        color: '#333',
     },
     emptyEventText: {
         fontSize: 20,
