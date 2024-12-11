@@ -109,7 +109,7 @@ const ChatList = ({ navigation }) => {
       />
 
       <TouchableOpacity
-        style={styles.fab}
+        style={[styles.fab, {backgroundColor: isEditing ? "#e91e63" : "#007bff"}]}
         onPress={isEditing ? deleteSelectedChats : () => setModalVisible(true)}
       >
         <MaterialCommunityIcons name={isEditing ? 'trash-can' : 'plus'} size={28} color="white" />
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   chatName: { fontSize: 18, marginLeft: 10 },
   profilePicture: { width: 40, height: 40, borderRadius: 20 },
   sectionHeader: { fontSize: 22, fontWeight: 'bold', marginTop: 20, marginBottom: 10, color: '#333' },
-  fab: { position: 'absolute', bottom: 20, right: 20, backgroundColor: '#e91e63', width: 60, height: 60, borderRadius: 30, justifyContent: 'center', alignItems: 'center', elevation: 5 },
+  fab: { position: 'absolute', bottom: 20, right: 20, backgroundColor: '#007bff', width: 60, height: 60, borderRadius: 30, justifyContent: 'center', alignItems: 'center', elevation: 5 },
   modalContainer: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' },
   modalContent: { backgroundColor: 'white', margin: 20, borderRadius: 10, padding: 20 },
   modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },

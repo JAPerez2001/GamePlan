@@ -105,7 +105,7 @@ function Announcements() {
       </View>
 
       <TouchableOpacity
-        style={styles.fab}
+        style={[styles.fab, {backgroundColor: editMode ? "#e91e63" : "#007bff"}]}
         onPress={editMode ? handleDeleteAnnouncements : () => setModalVisible(true)}
       >
         <MaterialCommunityIcons

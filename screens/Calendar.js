@@ -7,8 +7,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 function Calendar({ route, navigation }) {
     const { showCreateEventModal, location } = route.params || {};
     const [items, setItems] = useState({
-        '2024-11-9': [{ name: 'Practice', data: '@UTD campus' }],
-        '2024-11-10': [{ name: 'Tournament', data: '@UTD campus' }]
+        '2024-12-9': [{ name: 'Practice', data: '@UTD campus' }],
+        '2024-12-10': [{ name: 'Tournament', data: '@UTD campus' }]
     });
 
     const [modalVisible, setModalVisible] = useState(!!showCreateEventModal);
@@ -16,8 +16,13 @@ function Calendar({ route, navigation }) {
     const newDate = new Date();
     const [selectedDate, setSelectedDate] = useState(`${newDate.getFullYear()}-${newDate.getMonth() + 1}-${newDate.getDate()}`);
     const [showDate, setShowDate] = useState(false);
+    const [isValid, setIsValid] = useState(true);
 
     const addEvent = () => {
+        if(!newEvent.name) {
+            setIsValid(false);
+            return;
+        }
         if (newEvent.name && selectedDate) {
             const newItems = {
                 ...items,
@@ -28,6 +33,7 @@ function Calendar({ route, navigation }) {
             };
             setItems(newItems);
             setNewEvent({ name: '', description: '', data: '' });
+            setIsValid(true);
             setModalVisible(false);
         }
     };
@@ -87,8 +93,10 @@ function Calendar({ route, navigation }) {
                             placeholder="Event Name"
                             value={newEvent.name}
                             onChangeText={(text) => setNewEvent({ ...newEvent, name: text })}
-                            style={styles.input}
+                            style={[styles.input, !isValid && styles.invalidInput]}
+                            onFocus={() => setIsValid(true)}
                         />
+                        {!isValid && <Text style={styles.errorText}>Event name is required</Text>}
 
                         <Text style={styles.modalLabel}>Date:</Text>
                         <TouchableOpacity onPress={() => setShowDate(true)} style={styles.dateButton}>
@@ -224,7 +232,19 @@ const styles = StyleSheet.create({
         color: 'gray',
         textAlign: 'center',
         paddingTop: 50,
-    }
+    },
+    invalidInput: {
+        borderColor: 'red',
+        shadowColor: 'red',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.7,
+        shadowRadius: 4,
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 12,
+        marginBottom: 10,
+    },
 });
 
 export default Calendar;
