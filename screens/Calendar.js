@@ -213,8 +213,8 @@ const styles = StyleSheet.create({
     emptyEventText: {
         fontSize: 20,
         color: 'gray',
-        justifyContent: 'center',
-        alignContent: 'center',
+        textAlign: 'center',
+        paddingTop: 50,
     }
 });
 
