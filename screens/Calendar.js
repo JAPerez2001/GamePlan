@@ -12,7 +12,7 @@ function Calendar({ route, navigation }) {
     });
 
     const [modalVisible, setModalVisible] = useState(!!showCreateEventModal);
-    const [newEvent, setNewEvent] = useState({ name: '', data: location ?? '' });
+    const [newEvent, setNewEvent] = useState({ name: '', description: '', data: location ?? '' });
     const newDate = new Date();
     const [selectedDate, setSelectedDate] = useState(`${newDate.getFullYear()}-${newDate.getMonth() + 1}-${newDate.getDate()}`);
     const [showDate, setShowDate] = useState(false);
@@ -27,7 +27,7 @@ function Calendar({ route, navigation }) {
                 }]
             };
             setItems(newItems);
-            setNewEvent({ name: '', data: '' });
+            setNewEvent({ name: '', description: '', data: '' });
             setModalVisible(false);
         }
     };
@@ -49,6 +49,7 @@ function Calendar({ route, navigation }) {
                 renderItem={(item, firstItemInDay) => (
                     <TouchableOpacity style={styles.item}>
                         <Text style={styles.itemText}>{item.name}</Text>
+                        <Text style={styles.itemText}>{item.description}</Text>
                         <Text style={styles.itemText}>{item.data}</Text>
                     </TouchableOpacity>
                 )}
@@ -103,6 +104,14 @@ function Calendar({ route, navigation }) {
                                 }}
                             />
                         )}
+
+                        <Text style={styles.modalLabel}>Description (optional):</Text>
+                        <TextInput
+                            placeholder="Details about the event..."
+                            value={newEvent.description}
+                            onChangeText={(text) => setNewEvent({ ...newEvent, description: text })}
+                            style={styles.input}
+                        />
 
                         <Text style={styles.modalLabel}>Location (optional):</Text>
                         <TextInput
