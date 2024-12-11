@@ -23,6 +23,7 @@ function Calendar({ route, navigation }) {
                 ...items,
                 [selectedDate]: [...(items[selectedDate] || []), {
                     name: newEvent.name,
+                    description: newEvent.description || ' ',
                     data: newEvent.data || ' '
                 }]
             };
