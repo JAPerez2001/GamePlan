@@ -58,9 +58,11 @@ function Calendar({ route, navigation }) {
                     setItems(newItems);
                 }}
                 renderEmptyData={() => {
-                    return <View>
+                    return (
+                    <View>
                         <Text style={styles.emptyEventText}>No events today</Text>
-                    </View>;
+                    </View>
+                    )
                 }}
                 loadItemsForMonth={month => {
                     console.log('trigger items loading');
@@ -212,8 +214,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: 'gray',
         justifyContent: 'center',
-        padding: 120,
-        paddingTop: 150,
+        alignContent: 'center',
     }
 });
 
